@@ -71,3 +71,55 @@ app.directive("text", function(){
     }
   };
 });
+
+app.directive("repeatNtimes",function(){
+  return {
+    restrict: "E",
+    compile: function (tElements,attrs){
+        var content=tElements.children();
+        for (var i=1;i<attrs.repeat;i++){
+          tElements.append(content.clone());
+        }
+    }
+  };
+});
+
+app.directive("basket",function(){
+  return {
+    restrict: "E",
+    controller: function($scope,$element,$attrs){
+      $scope.content=[];
+
+      this.addApple=function(){
+        $scope.content.push("apple");
+      };
+
+      this.addOrange=function(){
+        $scope.content.push("orange");
+      };
+    },
+    link:function(scope,element){
+      element.bind("mouseenter",function(){
+        console.log(scope.content);
+      });
+    }
+  };
+});
+
+app.directive("apple",function(){
+  return {
+    require:"basket",
+    link:function(scope,element,attrs,basketCtrl){
+      basketCtrl.addApple();
+    }
+  };
+});
+
+app.directive("orange",function(){
+  return {
+    require:"basket",
+    link:function(scope,element,attrs,basket){
+      basket.addOrange();
+    }
+  };
+});
