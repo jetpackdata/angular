@@ -74,10 +74,19 @@
         <repeat-ntimes repeat="3">
           <h1>Header 1</h1>
           <p>This is the paragraph.</p>
-        </repeat-n-times>
+        </repeat-ntimes>
 
         <basket apple orange>Roll over and i get added </basket>
 
+        <input type="text" ng-model="curr"/>
+        <p>Default:{{curr|currency}}</p>
+        <p>Formatted:{{curr|currency: "€"}}</p>
+
+        <ul ng-init="names=['spiderman','liono','thor','goblin']">
+          <li ng-repeat="name in names | exclude:'thor'">
+           <span>{{name}}</span>
+          </li>
+        </ul>
         
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
