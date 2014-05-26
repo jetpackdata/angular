@@ -64,3 +64,12 @@ app.directive("myAnotherwidg", function(){
   };
 });
 
+app.directive("myWidget1", function(){
+  return {
+    restrict: "E",
+    template: "<h1>{{text}}</h1>",
+    scope:{
+      text:"@text"
+    }
+  };
+});
