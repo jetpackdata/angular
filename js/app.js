@@ -37,7 +37,6 @@ app.directive("myWidget",function(){
   var linkFn=function(scope,element,attributes){
     var paragraph=element.children()[0];
     $(paragraph).on("click",function(){
-      alert("clci");
       $(this).css({"background-color":"red"});
     });
   };
@@ -56,7 +55,6 @@ app.directive("myWidgeter", function(){
 });
 
 app.directive("myAnotherwidg", function(){
-  alert("hi");
   return {
     restrict : "A",
     transclude: true,
@@ -64,9 +62,9 @@ app.directive("myAnotherwidg", function(){
   };
 });
 
-app.directive("myWidget1", function(){
+app.directive("text", function(){
   return {
-    restrict: "E",
+    restrict: "A",
     template: "<h1>{{text}}</h1>",
     scope:{
       text:"@text"
