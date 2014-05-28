@@ -1,5 +1,5 @@
 
-  var app=angular.module("MyApp",[]);
+  var app=angular.module("MyApp",['ngResource']);
 
   app.controller("MyCtrl", function($scope){
     $scope.name="Peter";
@@ -135,3 +135,50 @@ app.filter("exclude",function(){
     return result;
   };
 });
+
+app.
+  config(function ( $httpProvider) {        
+        delete $httpProvider.defaults.headers.common['X-Requested-With'];
+  }).
+  factory("Post", function($resource){
+  return $resource('http://jet-packdata.rhcloud.com/api/v0/who');
+});
+
+app.controller("PostsCtrl", function($scope,$http){
+  $http.get('js/data.json').
+    success(function(data,status,headers,config){
+      $scope.posts=data;
+    }).
+    error(function(data,status,headers,config){
+      alert("errors");
+    });
+});
+
+
+app.controller("PostsFacCtrl", function($scope,Post){
+  Post.get(function(data){
+    $scope.post=data;
+  });
+});
+
+app.directive("contenteditable",function(){
+  return {
+    restrict:"A",
+    require:"ngModel",
+    link:function(scope,element,attrs,ngModel){
+      alert(element);
+      function read(){
+        ngModel.$setViewValue(element.html());
+      }
+
+      ngModel.$render=function(){
+        element.html(ngModel.$viewValue||'');
+      };
+
+      element.bind("blur keyup change",function(){
+        scope.$apply(read);
+      });
+    }
+  };
+});
+
