@@ -1,0 +1,129 @@
+<html>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.16/angular.min.js"></script>
+
+
+</head>
+<body ng-app='myApp'>
+
+<div ng-controller='ChoreCtrl'>
+	<h3>Ctrl ("Scope:&" >> Evaluates expressions</h3>
+	<kid done="logChore(chore)"></kid>
+	<kid done="logChore(chore)"></kid>
+	<p>------------------------</p>
+	<h3>Ctrl ("Scope:@"):</h3>
+	<div attherate="heyo"></div>
+	<h3>Ctrl ("Scope:@" >> Ctrl > Directive but not otherway around):</h3>
+	<input type="text" ng-model='donerVal'/>
+
+	<h3>Directive:</h3>:
+	<div attherate="{{donerVal}}"></div>
+	<p>------------------------</p>
+	<h3>Ctrl ("Scope:=" >> Ctrl <> Directive Bothways)</h3>
+	<input type="text" ng-model='equalVal'/>
+
+	<h3>Directive:</h3>
+	<div equalto="equalVal"></div>
+</div>
+
+<div>
+	<p>------------------------</p>
+	<h3>Transclusion</h3>
+
+		<panel>
+			<p>Im coming in </p>
+		</panel>
+</div>
+
+<div>
+	<p>------------------------</p>
+	<h3>Create and compile Element - also use watch</h3>
+	
+	<dumbpassword>
+		
+	</dumbpassword>
+</div>
+
+<h3>Controller gets $scope</h3>
+<h3>Directive gets passed scope, elements, attr (Order is important)</h3>
+
+<div ng-controller='minifyResolver'>
+{{noLossVar}}
+</div>
+
+</body>
+
+	<script type="text/javascript">
+		var app=angular.module('myApp',[]);
+		app.controller("ChoreCtrl",function($scope){
+
+			$scope.logChore = function(chore){
+				alert(chore + ' is done');
+			};
+
+			$scope.donerVal='where am i';
+
+			$scope.equalVal='is equal to';
+		});
+
+		app.controller("minifyResolver",['$scope',function(a){
+			a.noLossVar='I wont be lost in minification'
+		}]);
+
+		// To evaluate function
+		app.directive("kid", function(){
+			return {
+				restrict:"E",
+				scope:{
+					done:"&"
+				},
+				template:'<input type="text" ng-model="chore"/>'+'{{chore}}' +'<input type="button" ng-click="done({chore:chore})" value="done"/>'	
+			}	
+		});
+		// To evaluate objects
+		app.directive("attherate", function(){
+			return {
+				scope:{
+					attherate:"@"
+				},
+				template:'<input type="text" ng-model="attherate">'
+			}
+		});
+		// To evaluate and set
+		app.directive("equalto", function(){
+			return {
+				scope:{
+					equalto:"="
+				},
+				template:'<input type="text" ng-model="equalto"/>'
+			}
+		});
+		//Transclusion
+		app.directive("panel",function(){
+			return{
+				//scope:{},
+				restrict:'E',
+				//replace:true,
+				transclude:true,
+				template:'<h3>What\'s up dawg<p ng-transclude></p></h3>'
+			}
+		});
+
+		app.directive("dumbpassword",function(){
+			return{
+				restrict:'E',
+				replace:true,
+				template:'<div><input type="text" ng-model="textPass"/>'+'{{textpass}}</div>',
+				link: function(scope,element){
+					scope.$watch("textPass", function(value){
+						if(value==="password"){
+							alert("hi");
+						}
+					});
+				}
+			}
+		});
+
+	</script>
+
+</html>
