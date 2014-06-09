@@ -52,7 +52,8 @@
 {{noLossVar}}
 </div>
 
-<div ng-controller='initCtrl'>
+	<error></error>
+<div ng-controller='viewCtrl'>
 	<p>------------------------</p>
 	<div ng-view></div>
 </div>
@@ -93,6 +94,18 @@
 			})
 		});
 
+		app.directive("error",function($rootScope){
+			return {
+				restrict:'E',
+				template:'<h3 ng-show="isError">Yo buddy. There is a data load error</h3>',
+				link:function($scope){
+					$rootScope.$on("$routeChangeError",function(event,current,previous,rejection){
+						$scope.isError=true;
+				})
+			}
+		}
+
+		});
 		app.controller("initCtrl",function($rootScope){
 			$rootScope.$on("$routeChangeError",function(event,current,previous,rejection){
 				console.log(event);
@@ -106,13 +119,20 @@
 			$scope.model ={
 				message: $routeParams.message
 			}
+
+			$scope.chRoute=function(a){
+						alert(a);
+						$location.path("/hey/whatsup");
+			}
+
 		});
 
 		viewCtrl.loadData1=function($q){
 							var defer=$q.defer();
-							defer.reject("I dont want to work");
+							defer.resolve("I dont want to work");
 							return defer.promise;
 		}
+
 
 
 		var RoCtrl=app.controller("routingCtrl",function($scope){
