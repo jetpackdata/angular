@@ -1,6 +1,7 @@
 <html>
 <head>
-<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.16/angular.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.16/angular.js"></script>
+<script src="https://code.angularjs.org/1.2.17/angular-route.js"></script>
 
 
 </head>
@@ -51,10 +52,83 @@
 {{noLossVar}}
 </div>
 
+<div ng-controller='initCtrl'>
+	<p>------------------------</p>
+	<div ng-view></div>
+</div>
+
+<div>
+	<p>------------------------</p>
+	<div ng-controller="promCtrl"><h3>Alerting promises</h3</div>
+</div>
+
 </body>
 
 	<script type="text/javascript">
-		var app=angular.module('myApp',[]);
+		var app=angular.module('myApp',['ngRoute']);
+
+		app.config(function($routeProvider){
+			$routeProvider
+			.when("/",{
+				templateUrl:"1.html",
+				controller:"routingCtrl",
+				resolve:{
+					loadData:RoCtrl.loadData
+				}
+			})
+			.when("/hey/:message",{
+				templateUrl:"2.html",
+				controller:"viewCtrl",
+				resolve:{
+					loadData1:viewCtrl.loadData1
+				}
+			})
+			.when("/heyo/:message",{
+				redirectTo:function(routeParams,search,path){
+					console.log(routeParams);
+					console.log(path);
+					console.log(search);
+					return "/";
+				}
+			})
+		});
+
+		app.controller("initCtrl",function($rootScope){
+			$rootScope.$on("$routeChangeError",function(event,current,previous,rejection){
+				console.log(event);
+				console.log(current);
+				console.log(previous);
+				console.log(rejection);
+			})
+		});
+
+		var viewCtrl =app.controller("viewCtrl",function($scope,$routeParams){
+			$scope.model ={
+				message: $routeParams.message
+			}
+		});
+
+		viewCtrl.loadData1=function($q){
+							var defer=$q.defer();
+							defer.reject("I dont want to work");
+							return defer.promise;
+		}
+
+
+		var RoCtrl=app.controller("routingCtrl",function($scope){
+			$scope.model ={
+				message: "Hey man"
+			}
+		});
+
+		RoCtrl.loadData=function($q,$timeout){
+								var defer=$q.defer();
+								$timeout(function(){
+								defer.resolve()},2000);
+								return defer.promise;
+								}
+
+
 		app.controller("ChoreCtrl",function($scope){
 
 			$scope.logChore = function(chore){
@@ -109,11 +183,12 @@
 			}
 		});
 
-		app.directive("dumbpassword",function(){
+		app.directive("dumbpassword",function($templateCache){
+			console.log($templateCache)
 			return{
 				restrict:'E',
-				replace:true,
-				template:'<div><input type="text" ng-model="textPass"/>'+'{{textpass}}</div>',
+				replace:false,
+				templateUrl:'templeUrl.html',
 				link: function(scope,element){
 					scope.$watch("textPass", function(value){
 						if(value==="password"){
@@ -122,6 +197,26 @@
 					});
 				}
 			}
+		});
+
+
+
+
+
+		app.controller("promCtrl",function($scope,$q){
+			var defer=$q.defer();
+
+			defer.promise
+				.then(function(cnt){
+					alert("Promise # " + cnt.counter);
+					clnCnt=cnt.counter+1;
+					return clnCnt
+				})
+				.then(function(clnCnt){
+					alert("Promise # " + clnCnt);
+				})
+
+			defer.resolve({counter:1});
 		});
 
 	</script>
