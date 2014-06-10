@@ -53,7 +53,7 @@
 </div>
 
 
-<div ng-controller='viewCtrl'>
+<div ng-controller='initCtrl'>
 	<p>------------------------</p>
 	<error></error>
 	<div ng-view></div>
@@ -107,13 +107,23 @@
 		}
 
 		});
-		app.controller("initCtrl",function($rootScope){
+		app.controller("initCtrl",function($rootScope,$scope,$route,$location){
 			$rootScope.$on("$routeChangeError",function(event,current,previous,rejection){
-				console.log(event);
+				console.log($rootScope,$scope,$route,$location);
+			});
+
+			$rootScope.$on("$routeChangeStart",function(event,current,previous,rejection){
+				console.log("RouteChangeStart");
 				console.log(current);
-				console.log(previous);
-				console.log(rejection);
+				console.log($rootScope,$scope,$route,$location);
 			})
+
+			$rootScope.$on("$routeChangeSuccess",function(event,current,previous,rejection){
+				console.log("RouteChangeSuccess");
+				console.log(current);
+				console.log($rootScope,$scope,$route,$location);
+			})
+
 		});
 
 		var viewCtrl =app.controller("viewCtrl",function($scope,$routeParams,$location){
