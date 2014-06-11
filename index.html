@@ -52,6 +52,11 @@
 {{noLossVar}}
 </div>
 
+<div>
+	<p>------------------------</p>
+	<div ng-controller="promCtrl"><h3>Alerting promises</h3</div>
+</div>
+
 
 <div ng-controller='initCtrl'>
 	<p>------------------------</p>
@@ -61,15 +66,81 @@
 
 <div>
 	<p>------------------------</p>
-	<div ng-controller="promCtrl"><h3>Alerting promises</h3</div>
+	<div ng-controller="gameCtrl1"><h3>I'm injected through factories: {{game}}</h3></div>
 </div>
+
+<div>
+	<p>------------------------</p>
+	<div ng-controller="gameCtrl2"><h3>I'm also injected but another type of factory defined through config: {{game}}</h3></div>
+</div>
+
+<div>
+	<p>------------------------</p>
+	<div ng-controller="gameCtrl3"><h3>I'm also injected but provided through config: {{game}}</h3></div>
+</div>
+
+<div>
+	<p>------------------------</p>
+	<div ng-controller="gameCtrl4"><h3>I'm also injected but not provided through config and directly with Providers: {{game}}</h3></div>
+</div>
+
+<div>
+	<p>------------------------</p>
+	<div ng-controller="OldCtrl as o1">
+		<div ng-controller="NewCtrl as n1">
+			<input type='text' name='o1' ng-model="name":>
+			<input type='text' name='n1' ng-model="name":>
+		</div>
+	</div>
+</div>
+
 
 </body>
 
 	<script type="text/javascript">
 		var app=angular.module('myApp',['ngRoute']);
 
-		app.config(function($routeProvider,$locationProvider){
+		app.controller("OldCtrl",function($scope){
+			$scope.name="Heyman";
+		});
+
+		app.controller("NewCtrl",function($scope){
+			$scope.name="Heyman";
+		});
+
+		app.provider("gameProvNoConfig",function(){
+			var type;
+			return{
+				setType:function(value){
+					type=value;
+				},
+				$get:function(){
+					return {
+						title :type+" providerNoConfig - MaxPayne"
+					}
+				}
+			}
+		})
+
+		app.config(function($routeProvider,$locationProvider,$provide,gameProvNoConfigProvider){
+
+			gameProvNoConfigProvider.setType("Through getters and setters:")
+
+			$provide.factory("gameConfig",function(){
+				return {
+					title:'Configd-Maxypayne'
+				}
+			});
+
+			$provide.provider("gameProv",function(){
+				return {
+					$get: function(){
+						return {
+							title:'Provided - MaxPayne'
+						}
+					}
+				}
+			});
 			$routeProvider
 			.when("/",{
 				templateUrl:"1.html",
@@ -94,7 +165,6 @@
 				}
 			})
 		});
-
 		app.directive("error",function($rootScope){
 			return {
 				restrict:'E',
@@ -103,9 +173,7 @@
 					$rootScope.$on("$routeChangeError",function(event,current,previous,rejection){
 						$scope.isError=true;
 				})
-			}
-		}
-
+			}}
 		});
 		app.controller("initCtrl",function($rootScope,$scope,$route,$location){
 			$rootScope.$on("$routeChangeError",function(event,current,previous,rejection){
@@ -123,9 +191,7 @@
 				console.log(current);
 				console.log($rootScope,$scope,$route,$location);
 			})
-
 		});
-
 		var viewCtrl =app.controller("viewCtrl",function($scope,$routeParams,$location){
 			$scope.model ={
 				message: $routeParams.message
@@ -135,7 +201,6 @@
 						alert(a);
 						$location.path("/");
 			}
-
 		});
 
 		viewCtrl.loadData1=function($q){
@@ -143,8 +208,6 @@
 							defer.resolve("I dont want to work");
 							return defer.promise;
 		}
-
-
 
 		var RoCtrl=app.controller("routingCtrl",function($scope,$routeParams,$location){
 			$scope.model ={
@@ -154,7 +217,6 @@
 						alert(a);
 						$location.path("/hey/whatsup");
 			}
-
 		});
 
 		RoCtrl.loadData=function($q,$timeout){
@@ -163,7 +225,6 @@
 								defer.resolve()},2000);
 								return defer.promise;
 								}
-
 
 		app.controller("ChoreCtrl",function($scope){
 
@@ -235,10 +296,6 @@
 			}
 		});
 
-
-
-
-
 		app.controller("promCtrl",function($scope,$q){
 			var defer=$q.defer();
 
@@ -253,6 +310,32 @@
 				})
 
 			defer.resolve({counter:1});
+		});
+		app.factory("gameNamer",function(){
+			return {
+				title:'MaxPayne'
+			}
+		});
+
+		app.controller("gameCtrl1",function($scope,gameNamer){
+				$scope.game=gameNamer.title;
+		});
+
+		angular.injector(["myApp"]).invoke(function(gameNamer){
+			alert(gameNamer.title +" injection");
+		})
+
+		app.controller("gameCtrl2",function($scope,gameConfig){
+				$scope.game=gameConfig.title;
+		});
+
+		app.controller("gameCtrl3",function($scope,gameProv){
+			$scope.game=gameProv.title;
+		});
+
+
+		app.controller("gameCtrl4",function($scope,gameProvNoConfig){
+			$scope.game=gameProvNoConfig.title;
 		});
 
 	</script>
